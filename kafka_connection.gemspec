@@ -36,4 +36,5 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "codacy-coverage"
   spec.add_development_dependency "pry-byebug"
   spec.add_dependency "ruby-kafka", "~> 0.3.15"
+  spec.add_dependency "connection_pool", "~> 2.2.1"
 end

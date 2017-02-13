@@ -54,6 +54,47 @@ RSpec.describe KafkaConnection do
       end
     end
 
+    describe '#pool' do
+      let(:pool) { described_class.pool(app_name: app_name, env_name: env_name, size: 2) }
+      describe '#with' do
+        it 'yields a new Connection' do
+          expect(KafkaConnection::Connection).to receive(:new)
+            .with(app_name: app_name, env_name: env_name, pool_idx: 1)
+            .and_return(:connection)
+          expect { |b| pool.with(&b) }.to yield_with_args(:connection)
+        end
+        context 'when called a second time' do
+          it 'yields the same Connection' do
+            expect(KafkaConnection::Connection).to receive(:new)
+              .with(app_name: app_name, env_name: env_name, pool_idx: 1).once
+              .and_return(:connection)
+            expect { |b| pool.with(&b) }.to yield_with_args(:connection)
+            expect { |b| pool.with(&b) }.to yield_with_args(:connection)
+          end
+          context 'before the first connection is released' do
+            it 'creates another connection with an increased pool_idx' do
+              allow(KafkaConnection::Connection).to receive(:new)
+                .with(app_name: app_name, env_name: env_name, pool_idx: 1)
+                .and_return(:connection1)
+              allow(KafkaConnection::Connection).to receive(:new)
+                .with(app_name: app_name, env_name: env_name, pool_idx: 2)
+                .and_return(:connection2)
+              t = Thread.new do
+                pool.with do |c|
+                  sleep 3
+                end
+              end
+              expect { |b| pool.with(&b) }.to yield_with_args(:connection2)
+              t.join
+            end
+          end
+        end
+        # it 'yields a KafkaConnection::Connection' do
+        #   expect { |b| pool.with(&b) }.to yield_with_args(instance_of(KafkaConnection::Connection))
+        # end
+      end
+    end
+
     describe '#producer' do
       it 'instantiates a Kafka producer' do
         expect(kafka_client).to receive(:producer)
