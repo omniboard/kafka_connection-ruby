@@ -79,12 +79,17 @@ RSpec.describe KafkaConnection do
               allow(KafkaConnection::Connection).to receive(:new)
                 .with(app_name: app_name, env_name: env_name, pool_idx: 2)
                 .and_return(:connection2)
+              @still_waiting = true
               t = Thread.new do
                 pool.with do |c|
-                  sleep 3
+                  while @still_waiting
+                    sleep 0.5
+                  end
                 end
               end
+              sleep 1
               expect { |b| pool.with(&b) }.to yield_with_args(:connection2)
+              @still_waiting = false
               t.join
             end
           end
