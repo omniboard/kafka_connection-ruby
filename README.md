@@ -1,5 +1,6 @@
 [![Build Status](https://travis-ci.org/omniboard/kafka_connection-ruby.svg?branch=master)](https://travis-ci.org/omniboard/kafka_connection-ruby)
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/d190161ce0a14b9eaf1e78faa7c4f2f1)](https://www.codacy.com/app/Omniboard/kafka_connection-ruby?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=omniboard/kafka_connection-ruby&amp;utm_campaign=Badge_Grade)
+[![Codacy Badge](https://api.codacy.com/project/badge/Coverage/d190161ce0a14b9eaf1e78faa7c4f2f1)](https://www.codacy.com/app/Omniboard/kafka_connection-ruby?utm_source=github.com&utm_medium=referral&utm_content=omniboard/kafka_connection-ruby&utm_campaign=Badge_Coverage)
 
 # kafka_connection
 
