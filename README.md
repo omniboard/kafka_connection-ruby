@@ -1,8 +1,6 @@
 # KafkaConnection
 
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/kafka_connection`. To experiment with that code, run `bin/console` for an interactive prompt.
-
-TODO: Delete this and the text above, and describe your gem
+A standard object to consume from and produce to Kafka queues.
 
 ## Installation
 
@@ -22,7 +20,17 @@ Or install it yourself as:
 
 ## Usage
 
-TODO: Write usage instructions here
+This gem requires the following environment variables:
+
+- `KAFKA_BROKERS`: Comma-separated list of brokers. E.g. "kafka+ssl://hostname:9092"
+- `KAFKA_CA`: The CA certificate in PEM format.
+- `KAFKA_CERT`: The client's certificate in PEM format.
+- `KAFKA_PRIVATE_KEY`: The client's private key in PEM format.
+
+The PEM-format keys are multi-line values and must not have their lines concatenated.
+If your environment does not make it easy to set variables containing newlines, you can use the string "\n" (acually containing a backslash) in place of newline characters.
+
+- `KAFKA_TOPIC_PREFIX`: Optional. If present, any topic names used with the consumer or producer will be prefixed with this string.
 
 ## Development
 
@@ -32,8 +40,7 @@ To install this gem onto your local machine, run `bundle exec rake install`. To 
 
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/[USERNAME]/kafka_connection.
-
+Bug reports and pull requests are welcome.
 
 ## License
 
