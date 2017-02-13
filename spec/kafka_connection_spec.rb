@@ -89,9 +89,6 @@ RSpec.describe KafkaConnection do
             end
           end
         end
-        # it 'yields a KafkaConnection::Connection' do
-        #   expect { |b| pool.with(&b) }.to yield_with_args(instance_of(KafkaConnection::Connection))
-        # end
       end
     end
 
