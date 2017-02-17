@@ -9,19 +9,37 @@ A standard way to connect to Kafka to consume and produce.
 
 ## Installation
 
-Add this line to your application's Gemfile:
+### Authenticating
 
-```ruby
-gem 'kafka_connection'
+This is a private gem, so it is not hosted on [fury.io](https://fury.io).
+
+#### As a developer
+
+As a developer, you will need to create an account on fury.io and be added to the organization.
+Get your repo access token [from the management site](https://manage.fury.io/dashboard/omniboard/repos?kind=ruby), and configure Bundler to use it:
+
+```sh
+bundle config https://gem.fury.io/omniboard/ PeRSonAl-SeCrEt-ToKeN
 ```
 
-And then execute:
+#### For deployment or CI
 
-    $ bundle
+Get the organization's account access token [from the management site](https://manage.fury.io/manage/omniboard/settings/), and configure the environment on CI or an application:
 
-Or install it yourself as:
+```sh
+export BUNDLE_GEM__FURY__IO=PeRSonAl-SeCrEt-ToKeN
+```
 
-    $ gem install kafka_connection
+### In a new application
+Add this to your application's Gemfile, then run `bundle`:
+
+```rb
+source "https://gem.fury.io/omniboard/" do
+  gem 'kafka_connection'
+end
+```
+
+_Never_ place a repository access token in the Gemfile, or commit it to the repo anywhere else. The default instructions that Gemfury provides do this, but we use the [instructions for Bundler 1.8+](https://gemfury.com/help/install-gems#keep-your-privates-private-bundler-18).
 
 ## Usage
 
@@ -36,6 +54,49 @@ The PEM-format keys are multi-line values and must not have their lines concaten
 If your environment does not make it easy to set variables containing newlines, you can use the string "\n" (acually containing a backslash) in place of newline characters.
 
 - `KAFKA_TOPIC_PREFIX`: Optional. If present, any topic names used with the consumer or producer will be prefixed with this string.
+
+To create a connection to Kafka:
+```rb
+  kafka_connection = KafkaConnection.new(
+    app_name: "my_great_project", # Used as part of the Kafka client identifier
+    env_name: Rails.env.to_s.downcase,
+  )
+```
+
+To produce:
+```rb
+  kafka_producer = kafka_connection.producer
+  kafka_producer.produce("My great log entry", topic: "topic-name")
+  kafka_producer.deliver_messages
+
+  # Or use a pool of connections:
+  # (in config/initializers/kafka.rb):
+  max_threads = ENV.fetch("RAILS_MAX_THREADS") { 5 }.to_i
+  $kafka_connection_pool = KafkaConnection.pool(
+    size: max_threads,
+    timeout: 5,
+    app_name: "my_great_project",
+    env_name: Rails.env.to_s.downcase,
+  )
+
+  # (anywhere in the project):
+  $kafka_connection_pool.with do |kafka_connection|
+    kafka_producer = kafka_connection.producer
+    kafka_producer.produce("My great log entry", topic: "topic-name")
+    kafka_producer.deliver_messages
+  end
+```
+
+To consume:
+```rb
+  # `group_id` is the consumer group name; multiple processes with the same value will
+  # share the topic(s) (and each get different partitions).
+  kafka_consumer = kafka_connection.consumer(group_id: "#{Rails.env.to_s.downcase.downcase}.#{self.class.name}")
+  kafka_consumer.subscribe "topic-name"
+  kafka_consumer.each_message do |message|
+    process_message(message)
+  end
+```
 
 ## Development
 
