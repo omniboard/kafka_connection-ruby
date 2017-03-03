@@ -46,9 +46,9 @@ _Never_ place a repository access token in the Gemfile, or commit it to the repo
 This gem requires the following environment variables:
 
 - `KAFKA_BROKERS`: Comma-separated list of brokers. E.g. "kafka+ssl://hostname:9092"
-- `KAFKA_CA`: The CA certificate in PEM format.
-- `KAFKA_CERT`: The client's certificate in PEM format.
-- `KAFKA_PRIVATE_KEY`: The client's private key in PEM format.
+- `KAFKA_CA`: The CA certificate in PEM format. _(Required if a kafka+ssl broker is specified.)_
+- `KAFKA_CERT`: The client's certificate in PEM format. _(Required if a kafka+ssl broker is specified.)_
+- `KAFKA_PRIVATE_KEY`: The client's private key in PEM format. _(Required if a kafka+ssl broker is specified.)_
 
 The PEM-format keys are multi-line values and must not have their lines concatenated.
 If your environment does not make it easy to set variables containing newlines, you can use the string "\n" (acually containing a backslash) in place of newline characters.
