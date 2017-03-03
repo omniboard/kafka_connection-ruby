@@ -31,7 +31,7 @@ module KafkaConnection
 
     def check_environment!
       necessary_env_vars = %w(KAFKA_BROKERS)
-      if /kafka\+ssl:/.match(ENV['KAFKA_BROKERS'] || '')
+      if (ENV['KAFKA_BROKERS'] || '') =~ /kafka\+ssl:/
         necessary_env_vars += %w(KAFKA_CA KAFKA_CERT KAFKA_PRIVATE_KEY)
       end
       missing = necessary_env_vars.reject { |var| ENV[var] }
