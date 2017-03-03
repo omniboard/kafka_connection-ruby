@@ -5,7 +5,7 @@ require "kafka_connection/consumer"
 require "kafka_connection/pool"
 
 module KafkaConnection
-  def self.new(app_name:, env_name:, pool_idx:)
+  def self.new(app_name:, env_name:, pool_idx: 0)
     Connection.new(app_name: app_name, env_name: env_name, pool_idx: pool_idx)
   end
 
