@@ -20,7 +20,7 @@ RSpec.describe KafkaConnection do
   let(:env_name) { "test" }
   let(:pool_idx) { 12 }
 
-  context 'when KAFKA_BROKERS, KAFKA_CA, KAFKA_CERT, and KAFKA_PRIVATE_KEY environment variables are set' do
+  context 'when KAFKA_BROKERS and other required environment variables are set' do
     before do
       ENV['KAFKA_BROKERS'] = "host1:123,host2:234"
       ENV['KAFKA_CA'] = "-----BEGIN CA CERTIFICATE-----\nabcd\n---END---"
@@ -208,39 +208,51 @@ RSpec.describe KafkaConnection do
     end
   end
 
-  context 'when KAFKA_CA environment variable is not set' do
+  context 'when KAFKA_BROKERS contains at least one ssl broker' do
     before do
-      ENV['KAFKA_BROKERS'] = "host1:123,host2:234"
-      ENV['KAFKA_CERT'] = "-----BEGIN CERTIFICATE-----\\nabcd\\n---END---"
-      ENV['KAFKA_PRIVATE_KEY'] = "CERT_KEY"
+      ENV['KAFKA_BROKERS'] = "kafka+ssl://host1:123,host2:234"
     end
 
-    it 'raises an error' do
-      expect { instance }.to raise_error(/KAFKA_CA not set in the environment/)
+    context 'when KAFKA_CA environment variable is not set' do
+      before do
+        ENV['KAFKA_CERT'] = "-----BEGIN CERTIFICATE-----\\nabcd\\n---END---"
+        ENV['KAFKA_PRIVATE_KEY'] = "CERT_KEY"
+      end
+
+      it 'raises an error' do
+        expect { instance }.to raise_error(/KAFKA_CA not set in the environment/)
+      end
+    end
+
+    context 'when KAFKA_CERT environment variable is not set' do
+      before do
+        ENV['KAFKA_CA'] = "-----BEGIN CA CERTIFICATE-----\nabcd\n---END---"
+        ENV['KAFKA_PRIVATE_KEY'] = "CERT_KEY"
+      end
+
+      it 'raises an error' do
+        expect { instance }.to raise_error(/KAFKA_CERT not set in the environment/)
+      end
+    end
+
+    context 'when KAFKA_PRIVATE_KEY environment variable is not set' do
+      before do
+        ENV['KAFKA_CA'] = "-----BEGIN CA CERTIFICATE-----\nabcd\n---END---"
+        ENV['KAFKA_CERT'] = "-----BEGIN CERTIFICATE-----\\nabcd\\n---END---"
+      end
+
+      it 'raises an error' do
+        expect { instance }.to raise_error(/KAFKA_PRIVATE_KEY not set in the environment/)
+      end
     end
   end
-
-  context 'when KAFKA_CERT environment variable is not set' do
+  context 'when KAFKA_BROKERS does not contain an ssl broker' do
     before do
-      ENV['KAFKA_BROKERS'] = "host1:123,host2:234"
-      ENV['KAFKA_CA'] = "-----BEGIN CA CERTIFICATE-----\nabcd\n---END---"
-      ENV['KAFKA_PRIVATE_KEY'] = "CERT_KEY"
+      ENV['KAFKA_BROKERS'] = "kafka://host1:123,host2:234"
     end
 
-    it 'raises an error' do
-      expect { instance }.to raise_error(/KAFKA_CERT not set in the environment/)
-    end
-  end
-
-  context 'when KAFKA_PRIVATE_KEY environment variable is not set' do
-    before do
-      ENV['KAFKA_BROKERS'] = "host1:123,host2:234"
-      ENV['KAFKA_CA'] = "-----BEGIN CA CERTIFICATE-----\nabcd\n---END---"
-      ENV['KAFKA_CERT'] = "-----BEGIN CERTIFICATE-----\\nabcd\\n---END---"
-    end
-
-    it 'raises an error' do
-      expect { instance }.to raise_error(/KAFKA_PRIVATE_KEY not set in the environment/)
+    it 'does not require KAFKA_CA, KAFKA_CERT, or KAFKA_PRIVATE_KEY' do
+      expect { instance }.to_not raise_error
     end
   end
 end
