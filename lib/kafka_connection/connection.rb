@@ -45,7 +45,7 @@ module KafkaConnection
     # suppress them.
     def kafka_client_id
       [app_name, env_name, Socket.gethostname, Process.pid, pool_idx].map { |s|
-        s.to_s.gsub('_', '-').gsub(':', '.')
+        s.to_s.tr('_', '-').tr(':', '.')
       }.join('_')
     end
 
