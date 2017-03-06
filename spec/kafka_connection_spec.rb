@@ -16,7 +16,7 @@ RSpec.describe KafkaConnection do
   subject(:instance) {
     described_class.new(app_name: app_name, env_name: env_name, pool_idx: pool_idx)
   }
-  let(:app_name) { "app" }
+  let(:app_name) { "app_22_is_great_app" }
   let(:env_name) { "test" }
   let(:pool_idx) { 12 }
 
@@ -45,7 +45,8 @@ RSpec.describe KafkaConnection do
       it 'creates a Kafka object' do
         expect(Kafka).to receive(:new).with(
           seed_brokers: ['host1:123', 'host2:234'],
-          client_id: "#{app_name}:#{env_name}:#{Socket.gethostname}:#{Process.pid}:#{pool_idx}",
+          client_id:
+            "app-22-is-great-app_#{env_name}_#{Socket.gethostname}_#{Process.pid}_#{pool_idx}",
           ssl_ca_cert: "-----BEGIN CA CERTIFICATE-----\nabcd\n---END---",
           ssl_client_cert: "-----BEGIN CERTIFICATE-----\nabcd\n---END---",
           ssl_client_cert_key: 'CERT_KEY',
