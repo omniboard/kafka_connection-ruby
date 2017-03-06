@@ -38,8 +38,15 @@ module KafkaConnection
       raise "#{missing.join(', ')} not set in the environment" unless missing.empty?
     end
 
+    ##
+    # Creates a string that identifies this Kafka client. This is a concatenation of all information
+    # that will help us identify the source of a connection.
+    # Colons are not allowed in client ID strings (it causes a Kafka UnknownError), so we must
+    # suppress them.
     def kafka_client_id
-      [app_name, env_name, Socket.gethostname, Process.pid, pool_idx].join(':')
+      [app_name, env_name, Socket.gethostname, Process.pid, pool_idx].map { |s|
+        s.to_s.gsub('_', '-').gsub(':', '.')
+      }.join('_')
     end
 
     def kafka_configuration
